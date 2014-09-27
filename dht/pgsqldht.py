@@ -35,16 +35,18 @@ class Store(dhtlib.Store):
         self.conn.close()
 
     def save(self, infohash):
-        self.cache.add(infohash)
-        if len(list(self.cache)) > self.max_cache_size:
-            print 'flushing...'
-            tmp, self.cache = self.cache, set()
-            values = ','.join('(%s)' % i for i in tmp)
-            self.cur.execute('''
-            INSERT INTO hash(hash) VALUES %s
-            ''' % values
-            )
-            self.conn.commit()
+        print infohash
+        if not infohash in self.cache:
+            self.cache.add(infohash)
+            if len(list(self.cache)) > self.max_cache_size:
+                print 'flushing...'
+                tmp, self.cache = self.cache, set()
+                values = ','.join('(%s)' % i for i in tmp)
+                self.cur.execute('''
+                INSERT INTO hash(hash) VALUES %s
+                ''' % values
+                )
+                self.conn.commit()
 
 
 def main():
