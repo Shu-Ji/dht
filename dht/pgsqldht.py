@@ -28,8 +28,11 @@ class Store(dhtlib.Store):
     def create_table(self):
         self.cur.execute('''
         CREATE TABLE IF NOT EXISTS hash(
-            hash varchar(40) PRIMARY KEY
+            id SERIAL NOT NULL,
+            hash CHAR(40) NOT NULL UNIQUE,
+            status INT2 NOT NULL DEFAULT 0
         );
+        -- CREATE INDEX status_index ON hash(status);
         ''')
         self.conn.commit()
 
