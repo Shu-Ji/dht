@@ -123,7 +123,7 @@ class Client(KRPC):
     def run(self):
         self.bootstrap()
         while 1:
-            time.sleep(.0001)
+            time.sleep(.001)
             try:
                 data, address = self.ufd.recvfrom(65536)
                 msg = bdecode(data)
@@ -134,7 +134,7 @@ class Client(KRPC):
     def foreverloop(self):
         self.start()
         while 1:
-            time.sleep(.0001)
+            time.sleep(.001)
             if not self.table.nodes:
                 self.join_successed = False
                 time.sleep(1)
