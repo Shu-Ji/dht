@@ -62,7 +62,6 @@ servers = [
 def download(hash):
     h = hash.strip()
     for s in servers:
-        print h, s['url'] % s['case'](h)
         try:
             res = urllib2.urlopen(s['url'] % s['case'](h), timeout=10).read()
         except KeyboardInterrupt:
@@ -74,7 +73,6 @@ def download(hash):
 
 
 def set_downloaded(id, status):
-    print id, status
     cur.execute("""
     UPDATE hash SET status = %s WHERE id = %s
     """ % (status, id))
@@ -83,7 +81,7 @@ def set_downloaded(id, status):
 SUCCESS = 1
 FAILURE = 2
 while 1:
-    time.sleep(.01)
+    time.sleep(.001)
     hs = get_hashes()
     if not hs:
         break
@@ -93,7 +91,12 @@ while 1:
             set_downloaded(id, FAILURE)
             continue
         set_downloaded(id, SUCCESS)
-        open(osp.join(torrent_dir, hash) + '.torrent', 'wb').write(bt)
+
+        path = osp.join(torrent_dir, hash[:2], hash[-2:])
+        if not osp.exists(path):
+            os.makedirs(path)
+
+        open(osp.join(torrent_dir, path, hash) + '.torrent', 'wb').write(bt)
 
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         s = now + '\t' + str(id) + '\n'
