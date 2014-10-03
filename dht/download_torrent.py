@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 import os.path as osp
+import random
 import string
 import time
 import urllib2
@@ -32,10 +33,14 @@ def exit():
 atexit.register(exit)
 
 
-def get_hashes(limit=20):
+def get_hashes(limit=20, offset=0):
     cur.execute("""
-    SELECT id, hash FROM hash WHERE hash.status = 0 limit %s;
-    """ % limit)
+    SELECT id, hash
+    FROM hash
+    WHERE hash.status = 0
+    ORDER BY id desc
+    LIMIT %s OFFSET %s;
+    """ % (limit, offset))
     return cur.fetchall()
 
 
@@ -82,9 +87,11 @@ SUCCESS = 1
 FAILURE = 2
 while 1:
     time.sleep(.001)
-    hs = get_hashes()
+    offset = random.randint(100, 99999)
+    hs = get_hashes(limit=5, offset=offset)
     if not hs:
-        break
+        time.sleep(50)
+        continue
     for id, hash in hs:
         bt = download(hash)
         if bt is None:
