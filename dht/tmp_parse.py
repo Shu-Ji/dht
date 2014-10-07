@@ -95,10 +95,13 @@ def set_status(hash, status=4, no_sql=False):
     print hash, status
 
     if not no_sql:
+        print 'exe'
         cur.execute('''
         UPDATE hash SET status = %s WHERE hash.hash = '%s'
         ''' % (status, hash))
+        print 'com'
         conn.commit()
+        print 'comed'
 
     i = osp.join(hash[:2], hash[-2:])
     path =  osp.join(osp.expanduser('~/torrents.bak'), i, str(status))
@@ -106,17 +109,16 @@ def set_status(hash, status=4, no_sql=False):
         os.makedirs(path)
 
     i = osp.join('torrents', i, '%s.torrent' % hash)
+    print 'removing...'
     shutil.move(i, osp.join(path, hash + '.torrent'))
 
 
 def run():
-    idx = 0
     writer = ix.writer()
     for i in glob.iglob('torrents/*/*/*.torrent'):
-        idx += 1
+        print i, 'deal'
 
         hash = i.rsplit('/', 1)[-1].split('.')[0]
-
         try:
             raw_data = gzip.open(i).read()
         except:

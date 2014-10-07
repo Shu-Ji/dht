@@ -50,7 +50,7 @@ ix = open_dir(dht_whoosh_dir) # for read only
 searcher = ix.searcher()
 parser = QueryParser('name', schema=ix.schema)
 
-for keyword in (u'hello',):
+for keyword in (u'The Breakup Guru 分手大师',):
     q = parser.parse(keyword)
     results = searcher.search(q)
     print 'result of ', keyword

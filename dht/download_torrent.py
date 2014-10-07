@@ -6,6 +6,7 @@ import json
 import os
 import os.path as osp
 import random
+import requests
 import string
 import time
 import urllib2
@@ -46,21 +47,25 @@ def get_hashes(limit=20, offset=0):
 
 servers = [
     {
+        'url' : 'http://torrage.com/torrent/%s.torrent',
+        'case': string.upper
+    },
+    #{
+    #    'url' : 'http://torcache.net/torrent/%s.torrent',
+    #    'case': string.upper
+    #},
+    {
         'url' : 'https://zoink.it/torrent/%s.torrent',
         'case': string.upper
     },
-    {
-        'url' : 'http://torcache.net/torrent/%s.torrent',
-        'case': string.upper
-    },
+    #{
+    #    'url' : 'http://d1.torrentkittycn.com/?infohash=%s',
+    #    'case': string.upper,
+    #},
     #{
     #    'url' : 'http://bt.box.n0808.com/%s/%s/%s.torrent',
     #    'case': lambda h: (h[:2], h[-2:], h)
     #},
-    {
-        'url' : 'http://torrage.com/torrent/%s.torrent',
-        'case': string.upper
-    },
 ]
 
 
@@ -68,7 +73,16 @@ def download(hash):
     h = hash.strip()
     for s in servers:
         try:
-            res = urllib2.urlopen(s['url'] % s['case'](h), timeout=10).read()
+            headers = {}
+            headers['Referer'] = 'http://torrentkittycn.com/show/infohash/%s/nospider' % h.upper()
+
+            res = requests.get(s['url'] % s['case'](h), timeout=10,
+                    headers=headers)
+            c = res.content.lower()
+            if c.find('404') > -1 and c.find('not') > -1 and c.find('found') > -1:
+                continue
+            return res.content
+            #res = urllib2.urlopen(s['url'] % s['case'](h), timeout=10).read()
         except KeyboardInterrupt:
             raise
         except:
